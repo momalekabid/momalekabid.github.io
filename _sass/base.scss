@@ -1,8 +1,10 @@
 //Colors
 $base: #1B1212; 
 $light-grey: #DAF7A6; 
+body {
+background-color: $base;
+}
 
-{background-color: #1B1212}
 * {
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;

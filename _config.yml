@@ -1,7 +1,7 @@
 # Site settings
 title: Mohamed Malek Abid
 description: "Software Engineer and Student in the University of Waterloo's Computer Science Co-op program (grad. 2024)"
-url:  "https://momalekabid.com/" # Actual base url of the website
+url:  "https://momalekabid.github.io/" # Actual base url of the website
 baseurl: "/"           # url of the jekyll blog. e.g. if you set url to "mysite.com" and baseurl to "blog", the jekyll website will work on "mysite.com/blog"
 author:
   name: "Mohamed Malek Abid"
@@ -18,7 +18,7 @@ paginate_path: "/page:num/"
 
 #SEO
 twitter:
-  username: pandasekh
+  username: momalekabid
   card: summary
 facebook:
   app_id: # Facebook app ID for Facebook insights
@@ -27,9 +27,9 @@ facebook:
 logo: /assets/img/logo.jpg
 social:
   links: #List your social links here
-    - https://twitter.com/PandaSekh
-    - https://www.github.com/pandasekh
-    - https://www.linkedin.com/in/alessio-franceschi/
+    - https://twitter.com/momalekabid
+    - https://www.github.com/momalekabid
+    - https://www.linkedin.com/in/mohamed-malek-abid/
 webmaster_verifications:
   google: 
   bing: 

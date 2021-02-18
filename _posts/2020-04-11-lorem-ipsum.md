@@ -3,7 +3,7 @@ title: Official GDG Organizer
 layout: post
 categories: [Google APIs, Workshops]
 image: /assets/img/gdgyouthmain.jpg
-description: "Google Developer Group""
+description: "Google Developer Group"
 ---
 
 

@@ -13,7 +13,7 @@ permalink: /:year/:month/:day/:title:output_ext
 plugins: [jekyll-paginate, jekyll-feed, jekyll-seo-tag, jekyll-sitemap]
 
 #Pagination
-paginate: 0 
+paginate: 2 
 paginate_path: "/page:num/"
 
 #SEO
@@ -55,3 +55,6 @@ kramdown:
 sass:
   style: compressed
   sourcemap: never
+
+plugins:
+  - jekyll-pdf-embed

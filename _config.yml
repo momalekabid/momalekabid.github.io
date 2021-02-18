@@ -56,5 +56,3 @@ sass:
   style: compressed
   sourcemap: never
 
-plugins:
-  - jekyll-pdf-embed

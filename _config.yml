@@ -1,6 +1,6 @@
 # Site settings
 title: Mohamed Malek Abid
-description: "Vancouver, BC / Waterloo, Ontario"
+description: "Vancouver, BC // Waterloo, Ontario// Dubai, UAE"
 url:  "https://momalekabid.com/" # Actual base url of the website
 baseurl: "/"           # url of the jekyll blog. e.g. if you set url to "mysite.com" and baseurl to "blog", the jekyll website will work on "mysite.com/blog"
 author:
@@ -13,7 +13,7 @@ permalink: /:year/:month/:day/:title:output_ext
 plugins: [jekyll-paginate, jekyll-feed, jekyll-seo-tag, jekyll-sitemap]
 
 #Pagination
-paginate: 1 
+paginate: 4
 paginate_path: "/page:num/"
 
 #SEO

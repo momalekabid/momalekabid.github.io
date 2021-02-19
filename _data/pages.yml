@@ -2,4 +2,5 @@ pages:
   - {name: 'About', url: 'about.html'}
   - {name: 'Projects', url: 'archive.html'}
   - {name: 'Contact', url: 'contact.html'}
-  - {name: 'Resume', url: 'resume.pdf'}
+  - {name: 'Resume', url: 'momalekabid.pdf'}
+

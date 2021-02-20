@@ -1,6 +1,5 @@
 pages:
   - {name: 'About', url: 'about.html'}
-  - {name: 'Archive', url: 'archive.html'}
   - {name: 'Contact', url: 'contact.html'}
   - {name: 'Resume', url: 'momalekabid.pdf'}
 

@@ -1,1 +1,1 @@
-Personal website built with HTML/SCSS, Jekyll, some JS and Ruby. 
+Personal website built with HTML/SCSS, Jekyll, and Ruby. Theme based on a design by PandaSekh.

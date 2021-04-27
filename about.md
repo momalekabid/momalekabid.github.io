@@ -8,13 +8,10 @@ title: About
  and graduating from the American School of Dubai in 2020.
  Currently, I'm studying Computer Science at the University of Waterloo (grad. 2024) 
 
- 	 I'm currently exploring opportunities for spring 2021 (may -> august); areas of personal interest are 
 
-	 * Cybersecurity, 
 	 * Natural Language Processing, 
 	 * Decentralized finance
-	 
-	 
+	 	 
 	 In the past, I've worked with 
 	 * Enterprise Network Solutions
 	 * Information Technology

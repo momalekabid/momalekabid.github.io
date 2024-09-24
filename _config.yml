@@ -1,7 +1,8 @@
 # Site settings
-title: hey there internet traveler# site title
+title: my corner of the internet
 description: >- # site description
-  heya <a href="https://github.com/momalekabid" target="_blank" rel="noopener">@github</a>.
+  hey there internet traveler. i love computers so here we are.
+  <a href="https://github.com/momalekabid" target="_blank" rel="noopener">@github</a>.
 lang: en-US # default lang
 timezone: America/Toronto  # set your timezone
 image: assets/img/ogp.png # This image used for Open Graph more info https://ogp.me/
@@ -10,15 +11,15 @@ mode: dark # default theme "dark" | "light"
 
 # Profile settings
 author:
-  name: Jekyll Klisé # author name
+  name: ﷴ Malek Abid # author name
   bio: >- # tell to the world
-    The minimalist Jekyll theme, light and dark mode support, for running a personal site and blog, 
-    meet Klisé theme at <a href="https://github.com/piharpi/jekyll-klise" target="_blank" rel="noopener">@github</a>.
-  username: username # general username
-  github: github_username # github username
-  twitter: twitter_username # twitter username
+   Hey, i code hella, i just graduated and i've been doing this since the fourth grade, probably earlier if you count messing around with breadboards before that.
+    <a href="https://github.com/piharpi/jekyll-klise" target="_blank" rel="noopener">@github</a>.
+  username: momalekabid # general username
+  github: momalekabid # github username
+  twitter: momalekabid # twitter username
   facebook: facebook_username # facebook username
-  email: your-email@email.com # email adress
+  email: m8abid@uwaterloo.ca # email adress
   avatar: /assets/img/avatar.jpg # change with your own avatar
 
 # URL settings

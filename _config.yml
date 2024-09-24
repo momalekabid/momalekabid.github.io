@@ -13,7 +13,11 @@ mode: dark # default theme "dark" | "light"
 author:
   name: ﷴ Malek Abid # author name
   bio: >- # tell to the world
-   Hey, i code hella, i just graduated and i've been doing this since the fourth grade, probably earlier if you count messing around with breadboards before that.
+   Hey, i code hella, i'm graduating from uwaterloo in october - 
+    where i studied computer and cognitive science - 
+    and i've been doing this coding thing since I threw together some text-based games in the 
+    firefox javascript scratchpad in the fourth grade. 
+    prior to that i was falling in love with MS Paint, Nintendo Games, and breadboards.
     <a href="https://github.com/piharpi/jekyll-klise" target="_blank" rel="noopener">@github</a>.
   username: momalekabid # general username
   github: momalekabid # github username

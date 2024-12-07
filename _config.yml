@@ -1,24 +1,23 @@
 # Site settings
 title: my corner of the internet
 description: >- # site description
-  hey there internet traveler. i love computers so here we are.
+  hey there internet traveler. i <3 computers and the mind.
   <a href="https://github.com/momalekabid" target="_blank" rel="noopener">@github</a>.
 lang: en-US # default lang
 timezone: America/Toronto  # set your timezone
-image: assets/img/ogp.png # This image used for Open Graph more info https://ogp.me/
+image: assets/img/avatar.png # This image used for Open Graph more info https://ogp.me/
 repo: https://github.com/momalekabid/momalekabid.github.io # site repo [optional]
 mode: dark # default theme "dark" | "light"
 
 # Profile settings
 author:
-  name: ﷴ Malek Abid # author name
+  name: ﷴ (mohamed) malek abid # author name
   bio: >- # tell to the world
-   Hey, i code hella, i'm graduating from uwaterloo in october - 
-    where i studied computer and cognitive science - 
-    and i've been doing this coding thing since I threw together some text-based games in the 
-    firefox javascript scratchpad in the fourth grade. 
-    prior to that i was falling in love with MS Paint, Nintendo Games, and breadboards.
-    <a href="https://github.com/piharpi/jekyll-klise" target="_blank" rel="noopener">@github</a>.
+   i graduated from uwaterloo in october '24, where i studied computer and cognitive science.
+    i've been doing this coding thing since I threw together some text-based games on the 
+    firefox javascript scratchpad in the fourth grade.
+    <3 literature, mathematics, neural computation, signals, and systems.
+    <a href="https://github.com/momalekabid" target="_blank" rel="noopener">@github</a>.
   username: momalekabid # general username
   github: momalekabid # github username
   twitter: momalekabid # twitter username

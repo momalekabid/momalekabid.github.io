@@ -11,11 +11,11 @@ mode: dark # default theme "dark" | "light"
 
 # Profile settings
 author:
-  name: ﷴ (mohamed) malek abid # author name
+  name: mohamed malek abid # author name
   bio: >- # tell to the world
-   i graduated from uwaterloo in october '24, where i studied computer and cognitive science.
+   i graduated from uwaterloo in 2024, where i studied computer and cognitive science, and currently i'm researching neural computation as an NSC student @ iNi in Zurich.
     i've been doing this coding thing since I threw together some text-based games on the 
-    firefox javascript scratchpad in the fourth grade.
+    firefox javascript scratchpad a long long time ago in a galaxy not so far away. 
     <3 literature, mathematics, neural computation, signals, and systems.
     <a href="https://github.com/momalekabid" target="_blank" rel="noopener">@github</a>.
   username: momalekabid # general username

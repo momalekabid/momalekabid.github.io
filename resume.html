@@ -9,31 +9,35 @@ permalink: /resume/
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>resume</title>
 <style>
-  html, body { margin: 0; height: 100%; background: #111; color: #eee; }
-  body { display: flex; align-items: center; justify-content: center; }
-  pre { font-size: min(3.6vw, 3.2vh); line-height: 1.1; margin: 0; }
+  :root { --bg: #fff; --fg: #111; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #111; --fg: #eee; } }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: monospace; }
+  a { color: inherit; }
+  svg { width: min(90vw, 75vh); height: auto; display: block; }
+  p { margin: 1rem 0 0; }
 </style>
 </head>
 <body>
-<pre>
-                /"\
-               |\./|
-               |   |
-               |   |
-               |>~<|
-               |   |
-            /'\|   |/'\
-        /~\|   |   |   |__
-       |   |   }   |   |  \
-       |   |   |   |   |   \
-       | ~   ~   ~   ~ |`   )
-       |                   /
-        \                 /
-         \               /
-          \    _____    /
-           |--//''`\--|
-           | (( +==)) |
-           |--\_|_//--|
-</pre>
+<a href="https://permacomputing.net/" target="_blank" rel="noopener" aria-label="permacomputing.net">
+  <svg viewBox="-80 -70 160 180" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+    <!-- eight petals, one rotated every 45deg -->
+    <g id="petals">
+      <path id="petal" d="M0 0 Q24 -34 0 -60 Q-24 -34 0 0Z"/>
+      <use href="#petal" transform="rotate(45)"/>
+      <use href="#petal" transform="rotate(90)"/>
+      <use href="#petal" transform="rotate(135)"/>
+      <use href="#petal" transform="rotate(180)"/>
+      <use href="#petal" transform="rotate(225)"/>
+      <use href="#petal" transform="rotate(270)"/>
+      <use href="#petal" transform="rotate(315)"/>
+    </g>
+    <!-- stem and leaf -->
+    <path d="M0 60 V100"/>
+    <path d="M0 74 Q-28 56 -62 76 Q-30 94 0 74Z"/>
+    <path d="M0 74 L-54 76"/>
+  </svg>
+</a>
+<p><a href="https://permacomputing.net/" target="_blank" rel="noopener">permacomputing.net</a></p>
 </body>
 </html>

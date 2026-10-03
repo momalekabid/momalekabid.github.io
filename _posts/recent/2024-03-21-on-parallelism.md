@@ -3,7 +3,6 @@ layout: post
 title: "On Parallelism"
 date: 2024-03-21 09:00:00 +0700
 categories: computer-science parallel-computing
-tags: [parallel computing, distributed systems, concurrency]
 usemathjax: true
 ---
 
@@ -13,17 +12,8 @@ for about a week before my convocation. after about two days together, she banne
 **"finally, some parallelism"**.
 
 
-we know that Amdahl's Law:
-
-$$ S(n) = \frac{1}{(1-p) + \frac{p}{n}} $$
-
-tells us how much performance we get from parallelizing p % of n tasks. 
+there's amdahl's law, sure.
 I'm still figuring out if that's how this multi-tasking thing works in real life, though. One way that question haunted me is my attempts to get my site off the ground; I've been trying to get a post out for a while, but this is the first proper one, and that's partially because I needed a bit more time to get used to the idea of doing certain things (work, research, writing) in parallel. i don't really have a choice, otherwise, nothing will get done.
-I wrote this post in parallel while editing some other info; also, I remembered that I'm reading a couple of books in parallel, so let me list those, too. I can't promise that my future posts won't have the word parallel in them, but it definitely won't be nearly as bad as this one. 
-
-the bell jar by sylvia plath
-'about love' by anton chekhov
-
 
 anyways, that's just the start of this. for the uninitiated, here's some links:
 https://bpb-us-w2.wpmucdn.com/sites.gatech.edu/dist/f/516/files/2016/11/Potter-2007-What-can-AI-get-from-Neuroscience.pdf?bid=516

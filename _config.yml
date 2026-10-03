@@ -8,6 +8,7 @@ timezone: America/Toronto  # set your timezone
 image: assets/img/avatar.png # This image used for Open Graph more info https://ogp.me/
 repo: https://github.com/momalekabid/momalekabid.github.io # site repo [optional]
 mode: dark # default theme "dark" | "light"
+chat_relay: "wss://mohameds-macbook-pro.tail523ca9.ts.net" # public wss:// address of the porch relay, empty = chat offline
 
 # Profile settings
 author:

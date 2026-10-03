@@ -1,0 +1,149 @@
+---
+layout: null
+permalink: /chat/
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chat</title>
+<style>
+  :root { --bg: #ffffff; --fg: #111111; --dim: #888888; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #111111; --fg: #eeeeee; --dim: #777777; } }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: monospace; font-size: 14px; }
+  body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; }
+  a { color: inherit; }
+  .home { align-self: flex-start; color: var(--dim); text-decoration: none; }
+  .chat { width: min(480px, 100%); margin-top: 32px; }
+  .top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .status { color: var(--dim); }
+  .top button { font: inherit; color: var(--dim); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+  .top button:disabled { visibility: hidden; }
+  .log { height: min(60vh, 420px); overflow-y: auto; border-top: 1px solid var(--dim); border-bottom: 1px solid var(--dim); margin: 8px 0; padding: 8px 0; overflow-wrap: anywhere; }
+  .log p { margin: 0 0 6px; }
+  .log .sys { color: var(--dim); }
+  form { display: flex; gap: 8px; }
+  input {
+    flex: 1; min-width: 0; font: inherit; color: var(--fg); background: var(--bg);
+    border: 1px solid var(--fg); padding: 6px 8px;
+  }
+  form button { font: inherit; color: var(--bg); background: var(--fg); border: 0; padding: 6px 12px; cursor: pointer; }
+  input:disabled, form button:disabled { opacity: .4; }
+</style>
+</head>
+<body>
+<a class="home" href="/">← home</a>
+
+<div class="chat">
+  <div class="top">
+    <span class="status" id="status">connecting…</span>
+    <button id="next" disabled>someone else</button>
+  </div>
+  <div class="log" id="log" aria-live="polite"></div>
+  <form id="form">
+    <input id="text" maxlength="400" autocomplete="off" placeholder="say hi" disabled>
+    <button disabled>send</button>
+  </form>
+</div>
+
+<script>
+  // relay address comes from _config.yml, or ?relay=ws://localhost:7777 for testing
+  const RELAY = new URLSearchParams(location.search).get('relay') || '{{ site.chat_relay }}';
+
+  const status = document.getElementById('status');
+  const log = document.getElementById('log');
+  const input = document.getElementById('text');
+  const sendBtn = document.querySelector('form button');
+  const nextBtn = document.getElementById('next');
+
+  let ws = null, matched = false, retry = 2000;
+
+  function say(text, cls) {
+    const p = document.createElement('p');
+    if (cls) p.className = cls;
+    p.textContent = text;
+    log.appendChild(p);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function setMatched(on, text) {
+    matched = on;
+    input.disabled = sendBtn.disabled = nextBtn.disabled = !on;
+    status.textContent = text;
+  }
+
+  function connect() {
+    if (!RELAY || RELAY.charAt(0) === '{') {
+      setMatched(false, "nobody's online right now");
+      return;
+    }
+    status.textContent = 'connecting…';
+    try {
+      ws = new WebSocket(RELAY.replace(/\/$/, '') + '/visitor');
+    } catch (e) {
+      setMatched(false, "nobody's online right now");
+      return;
+    }
+    ws.onmessage = (ev) => {
+      let m;
+      try { m = JSON.parse(ev.data); } catch { return; }
+      switch (m.type) {
+        case 'matched':
+          retry = 2000;
+          setMatched(true, 'connected to someone');
+          say("you're talking to a real person. say hi", 'sys');
+          break;
+        case 'empty':
+          setMatched(false, "nobody's online right now. stick around");
+          break;
+        case 'msg':
+          say(`them: ${m.text}`);
+          break;
+        case 'gone':
+          say('they left', 'sys');
+          setMatched(false, 'looking…');
+          break;
+        case 'banned':
+          say('bye', 'sys');
+          setMatched(false, 'bye');
+          retry = Infinity;
+          break;
+        case 'error':
+          say(m.text, 'sys');
+          break;
+      }
+    };
+    ws.onclose = () => {
+      if (matched) say('connection closed', 'sys');
+      setMatched(false, "nobody's online right now");
+      if (retry !== Infinity) {
+        setTimeout(connect, retry);
+        retry = Math.min(retry * 2, 60000);
+      }
+    };
+  }
+
+  function send(obj) {
+    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
+  }
+
+  document.getElementById('form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text || !matched) return;
+    send({ type: 'msg', text });
+    say(`you: ${text}`);
+    input.value = '';
+  });
+  nextBtn.onclick = () => {
+    if (!matched) return;
+    say('you left', 'sys');
+    send({ type: 'reroll' });
+  };
+
+  connect();
+</script>
+</body>
+</html>

@@ -13,7 +13,7 @@ mode: dark # default theme "dark" | "light"
 author:
   name: "" # author name
   bio: >- # tell to the world
-    i'm researching neural computation as an NSC student @ iNi in Zurich.
+    i'm researching neural computation as an NSC student @ <a href="https://www.ini.uzh.ch/en.html" target="_blank" rel="noopener">iNi</a> in Zurich.
     <a href="https://github.com/momalekabid" target="_blank" rel="noopener">@github</a>.
   username: momalekabid # general username
   github: momalekabid # github username

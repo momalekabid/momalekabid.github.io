@@ -6,10 +6,6 @@
   url: /archive/
   external: false
 
-- title: chat
-  url: /porch/
-  external: false
-
 # Example:
 # - title: github
 #   url: https://github.com/piharpi/jekyll-klise

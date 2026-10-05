@@ -9,56 +9,49 @@ permalink: /porch/
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>porch</title>
 <style>
-  :root { --bg: #ffffff; --fg: #111111; --lcd: #e9e9e2; --dim: #888888; --lamp: #f5b942; --anon: #9a5f88; --keeper: #26876f; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #111111; --fg: #eeeeee; --lcd: #1d1d1b; --dim: #777777; --anon: #c39bb7; --keeper: #5fbfa6; }
-  }
+  :root { --bg: #ffffff; --fg: #111111; --dim: #888888; --lamp: #f5b942; --anon: #9a5f88; --keeper: #26876f; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #111111; --fg: #eeeeee; --dim: #777777; --anon: #c39bb7; --keeper: #5fbfa6; } }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: monospace; font-size: 14px; }
   body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; }
   .home { align-self: flex-start; color: var(--dim); text-decoration: none; font-size: 18px; }
-  .egg {
-    width: min(320px, 100%); margin-top: 16px; padding: 48px 34px 36px;
-    border: 2px solid var(--fg); border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%;
-    display: flex; flex-direction: column; align-items: center; gap: 18px;
-  }
-  .screen { width: 100%; border: 2px solid var(--fg); background: var(--lcd); padding: 6px; }
-  canvas { width: 100%; display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
-  .buttons { display: flex; gap: 22px; }
-  .buttons button {
-    width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--fg);
-    background: var(--bg); color: var(--fg); font: inherit; cursor: pointer; padding: 0;
-  }
-  .buttons button:active { background: var(--fg); color: var(--bg); }
-  .chat { width: min(420px, 100%); margin-top: 24px; }
-  .log { height: 220px; overflow-y: auto; border-top: 1px solid var(--dim); padding: 8px 0; overflow-wrap: anywhere; }
-  .log p { margin: 0 0 6px; }
-  .anon { color: var(--anon); }
-  .keeper { color: var(--keeper); }
+  .chat { width: min(480px, 100%); margin-top: 32px; }
+  .top { display: flex; justify-content: space-between; align-items: center; height: 24px; }
+  .dot { width: 10px; height: 10px; border: 2px solid var(--dim); }
+  .dot.connecting { animation: blink 1s steps(2) infinite; }
+  .dot.on { background: var(--lamp); border-color: var(--lamp); }
+  @keyframes blink { 50% { opacity: 0; } }
+  .icon { font: inherit; font-size: 18px; color: var(--dim); background: none; border: 0; padding: 0 2px; cursor: pointer; }
+  .icon:hover { color: var(--fg); }
+  .icon:disabled { visibility: hidden; }
+  .log { height: min(60vh, 420px); overflow-y: auto; border-top: 1px solid var(--dim); border-bottom: 1px solid var(--dim); margin: 8px 0; padding: 8px 0; display: flex; flex-direction: column; gap: 6px; }
+  .log p { margin: 0; max-width: 80%; overflow-wrap: anywhere; }
+  .log .them { align-self: flex-start; }
+  .log .me { align-self: flex-end; color: var(--dim); text-align: right; }
+  .log .name { margin-right: .5em; }
+  .log .them .name { color: var(--keeper); }
+  .log .me .name { color: var(--anon); }
+  .log hr { width: 100%; border: 0; border-top: 1px dashed var(--dim); margin: 6px 0; }
   form { display: flex; gap: 8px; }
   input {
     flex: 1; min-width: 0; font: inherit; color: var(--fg); background: var(--bg);
     border: 1px solid var(--fg); padding: 6px 8px;
   }
-  form button { font: inherit; font-size: 16px; color: var(--bg); background: var(--fg); border: 0; padding: 4px 14px; cursor: pointer; }
-  input:disabled, form button:disabled { opacity: .4; }
+  input:disabled, form button:disabled { opacity: .3; }
   input.shake { animation: shake .3s steps(4); }
   @keyframes shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
-  @media (prefers-reduced-motion: reduce) { input.shake { animation: none; } }
+  form button { font: inherit; font-size: 16px; color: var(--bg); background: var(--fg); border: 0; padding: 4px 14px; cursor: pointer; }
+  @media (prefers-reduced-motion: reduce) { .dot.connecting, input.shake { animation: none; } }
 </style>
 </head>
 <body>
 <a class="home" href="/" aria-label="home">←</a>
 
-<div class="egg">
-  <div class="screen"><canvas id="lcd" width="48" height="32"></canvas></div>
-  <div class="buttons">
-    <button id="talk" aria-label="talk">A</button>
-    <button id="next" aria-label="someone else">B</button>
-  </div>
-</div>
-
 <div class="chat">
+  <div class="top">
+    <span class="dot" id="dot" role="img" aria-label="status"></span>
+    <button class="icon" id="next" aria-label="someone else" disabled>↻</button>
+  </div>
   <div class="log" id="log" aria-live="polite"></div>
   <form id="form">
     <input id="text" maxlength="400" autocomplete="off" aria-label="message" disabled>
@@ -70,101 +63,40 @@ permalink: /porch/
   /* relay address comes from _config.yml, or ?relay=ws://localhost:7777 for testing */
   const RELAY = new URLSearchParams(location.search).get('relay') || '{{ site.chat_relay }}';
 
-  /* the screen is a little porch: posts, roof, a door, a lamp, a chair, and whoever's sitting there.
-     # always drawn, L lamp (lit when someone's there), r light rays, p the person */
-  const SCENE = [
-    '................................................',
-    '................................................',
-    '................................................',
-    '..############################################..',
-    '..#..........................................#..',
-    '..#..........................................#..',
-    '..#..........................................#..',
-    '..#..........................................#..',
-    '..#..........................................#..',
-    '..#...#########...............pp.............#..',
-    '..#...#.......#..............pppp............#..',
-    '..#...#.......#..r..r........pppp............#..',
-    '..#...#.......#...LL..........pp.............#..',
-    '..#...#.......#...LL..........pp.....#.......#..',
-    '..#...#.......#..r..r........ppp.....#.......#..',
-    '..#...#.......#.............p.pp.....#.......#..',
-    '..#...#.......#.............p.pp.....#.......#..',
-    '..#...#.......#...............pp.....#.......#..',
-    '..#...#.....#.#...............pp.....#.......#..',
-    '..#...#.......#...............pp.....#.......#..',
-    '..#...#.......#...........pppppp.....#.......#..',
-    '..#...#.......#...........p...########.......#..',
-    '..#...#.......#...........p...#......#.......#..',
-    '..#...#.......#...........p...#......#.......#..',
-    '..#...#.......#...........p...#......#.......#..',
-    '..#...#.......#..........pp...#......#.......#..',
-    '.##############################################.',
-    '................................................',
-    '................................................',
-    '................................................',
-    '................................................',
-    '................................................',
-  ];
-  /* thought bubbles: x, y offsets above the head, rising over time */
-  const BUBBLES = [[33, 8, 1], [35, 6, 2], [38, 4, 3]];
-
-  const lcd = document.getElementById('lcd');
-  const ctx = lcd.getContext('2d');
+  const dot = document.getElementById('dot');
   const log = document.getElementById('log');
   const input = document.getElementById('text');
   const sendBtn = document.querySelector('form button');
+  const nextBtn = document.getElementById('next');
 
   let ws = null, matched = false, retry = 2000, me = '', them = '';
-  let frame = 0, thinkUntil = 0;
 
-  function color(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
-
-  function draw() {
-    const fg = color('--fg'), lamp = color('--lamp');
-    const thinking = Date.now() < thinkUntil;
-    ctx.clearRect(0, 0, lcd.width, lcd.height);
-    SCENE.forEach((row, y) => [...row].forEach((ch, x) => {
-      if (ch === '#') ctx.fillStyle = fg;
-      else if (ch === 'L') ctx.fillStyle = matched ? lamp : fg;
-      else if (ch === 'r' && matched && frame) ctx.fillStyle = lamp;
-      else if (ch === 'p' && matched) ctx.fillStyle = fg;
-      else return;
-      ctx.fillRect(x, y, 1, 1);
-    }));
-    if (matched && thinking) {
-      ctx.fillStyle = fg;
-      /* bubbles appear one at a time, smallest first, like an 8-bit thought */
-      const shown = 1 + (Math.floor(Date.now() / 400) % 3);
-      BUBBLES.slice(0, shown).forEach(([x, y, s]) => {
-        if (s === 3) {
-          ctx.fillRect(x + 1, y, 2, 1); ctx.fillRect(x, y + 1, 1, 2);
-          ctx.fillRect(x + 3, y + 1, 1, 2); ctx.fillRect(x + 1, y + 3, 2, 1);
-        } else {
-          ctx.fillRect(x, y, s, s);
-        }
-      });
-    }
-  }
-
-  setInterval(() => { frame ^= 1; draw(); }, 400);
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
-
-  function line(name, cls, text) {
+  function line(text, who, name) {
     const p = document.createElement('p');
-    const n = document.createElement('span');
-    n.className = cls;
-    n.textContent = name + ': ';
-    p.appendChild(n);
+    p.className = who;
+    if (name) {
+      const n = document.createElement('span');
+      n.className = 'name';
+      n.textContent = name;
+      p.appendChild(n);
+    }
     p.appendChild(document.createTextNode(text));
     log.appendChild(p);
     log.scrollTop = log.scrollHeight;
   }
 
-  function setMatched(on) {
-    matched = on;
-    input.disabled = sendBtn.disabled = !on;
-    draw();
+  function divider() {
+    if (log.lastElementChild && log.lastElementChild.tagName !== 'HR') {
+      log.appendChild(document.createElement('hr'));
+      log.scrollTop = log.scrollHeight;
+    }
+  }
+
+  function setState(state) {
+    matched = state === 'on';
+    dot.className = 'dot ' + state;
+    input.disabled = sendBtn.disabled = nextBtn.disabled = !matched;
+    if (matched) input.focus();
   }
 
   function shake() {
@@ -174,11 +106,12 @@ permalink: /porch/
   }
 
   function connect() {
-    if (!RELAY || RELAY.charAt(0) === '{') return setMatched(false);
+    if (!RELAY || RELAY.charAt(0) === '{') return setState('off');
+    setState('connecting');
     try {
       ws = new WebSocket(RELAY.replace(/\/$/, '') + '/visitor');
     } catch (e) {
-      return setMatched(false);
+      return setState('off');
     }
     ws.onmessage = (ev) => {
       let m;
@@ -188,19 +121,21 @@ permalink: /porch/
           retry = 2000;
           me = m.to || me;
           them = m.keeper || them;
-          setMatched(true);
+          setState('on');
           break;
         case 'empty':
-        case 'gone':
-          setMatched(false);
+          setState('off');
           break;
         case 'msg':
-          thinkUntil = Date.now() + 3000;
-          line(m.from || them, 'keeper', m.text);
+          line(m.text, 'them', m.from || them);
+          break;
+        case 'gone':
+          divider();
+          setState('connecting');
           break;
         case 'banned':
           retry = Infinity;
-          setMatched(false);
+          setState('off');
           break;
         case 'error':
           shake();
@@ -208,7 +143,8 @@ permalink: /porch/
       }
     };
     ws.onclose = () => {
-      setMatched(false);
+      if (matched) divider();
+      setState('off');
       if (retry !== Infinity) {
         setTimeout(connect, retry);
         retry = Math.min(retry * 2, 60000);
@@ -225,13 +161,15 @@ permalink: /porch/
     const text = input.value.trim();
     if (!text || !matched) return;
     send({ type: 'msg', text });
-    line(me || 'you', 'anon', text);
+    line(text, 'me', me);
     input.value = '';
   });
-  document.getElementById('talk').onclick = () => input.focus();
-  document.getElementById('next').onclick = () => { if (matched) send({ type: 'reroll' }); };
+  nextBtn.onclick = () => {
+    if (!matched) return;
+    divider();
+    send({ type: 'reroll' });
+  };
 
-  draw();
   connect();
 </script>
 </body>

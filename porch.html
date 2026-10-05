@@ -9,50 +9,50 @@ permalink: /porch/
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>porch</title>
 <style>
-  :root { --bg: #ffffff; --fg: #111111; --dim: #888888; --lamp: #f5b942; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #111111; --fg: #eeeeee; --dim: #777777; } }
+  :root { --bg: #ffffff; --fg: #1b1f20; --dim: #8a9294; --rule: #c9cfd0; --anon: #9a5f88; --keeper: #26876f; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #11161a; --fg: #e3e6e6; --dim: #6b7376; --rule: #3a4245; --anon: #c39bb7; --keeper: #5fbfa6; }
+  }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: monospace; font-size: 14px; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: ui-monospace, Menlo, monospace; font-size: 15px; }
   body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; }
   .home { align-self: flex-start; color: var(--dim); text-decoration: none; font-size: 18px; }
-  .chat { width: min(480px, 100%); margin-top: 32px; }
-  .top { display: flex; justify-content: space-between; align-items: center; height: 24px; }
-  .dot { width: 10px; height: 10px; border: 2px solid var(--dim); }
-  .dot.connecting { animation: blink 1s steps(2) infinite; }
-  .dot.on { background: var(--lamp); border-color: var(--lamp); }
-  @keyframes blink { 50% { opacity: 0; } }
-  .icon { font: inherit; font-size: 18px; color: var(--dim); background: none; border: 0; padding: 0 2px; cursor: pointer; }
+  .term { width: min(640px, 100%); margin-top: 28px; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 10px; border-bottom: 1px solid var(--rule); }
+  .head b { font-weight: 700; }
+  .head .meta { color: var(--dim); }
+  .icon { font: inherit; font-size: 17px; color: var(--dim); background: none; border: 0; padding: 0 2px; cursor: pointer; }
   .icon:hover { color: var(--fg); }
   .icon:disabled { visibility: hidden; }
-  .log { height: min(60vh, 420px); overflow-y: auto; border-top: 1px solid var(--dim); border-bottom: 1px solid var(--dim); margin: 8px 0; padding: 8px 0; display: flex; flex-direction: column; gap: 6px; }
-  .log p { margin: 0; max-width: 80%; overflow-wrap: anywhere; }
-  .log .them { align-self: flex-start; }
-  .log .me { align-self: flex-end; color: var(--dim); text-align: right; }
-  .log hr { width: 100%; border: 0; border-top: 1px dashed var(--dim); margin: 6px 0; }
-  form { display: flex; gap: 8px; }
-  input {
-    flex: 1; min-width: 0; font: inherit; color: var(--fg); background: var(--bg);
-    border: 1px solid var(--fg); padding: 6px 8px;
-  }
-  input:disabled, form button:disabled { opacity: .3; }
+  .log { height: min(60vh, 440px); overflow-y: auto; padding: 10px 0; line-height: 1.5; }
+  .log p { margin: 0; overflow-wrap: anywhere; }
+  .t { color: var(--dim); margin-right: .6em; }
+  .sys { color: var(--dim); }
+  .anon { color: var(--anon); }
+  .keeper { color: var(--keeper); }
+  form { display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--rule); padding-top: 10px; }
+  .prompt { color: var(--dim); }
+  input { flex: 1; min-width: 0; font: inherit; color: var(--fg); background: transparent; border: 0; outline: none; padding: 4px 0; caret-color: var(--keeper); }
+  input:disabled { opacity: .3; }
   input.shake { animation: shake .3s steps(4); }
   @keyframes shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
-  form button { font: inherit; font-size: 16px; color: var(--bg); background: var(--fg); border: 0; padding: 4px 14px; cursor: pointer; }
-  @media (prefers-reduced-motion: reduce) { .dot.connecting, input.shake { animation: none; } }
+  form .icon:disabled { visibility: visible; opacity: .3; cursor: default; }
+  @media (prefers-reduced-motion: reduce) { input.shake { animation: none; } }
 </style>
 </head>
 <body>
 <a class="home" href="/" aria-label="home">←</a>
 
-<div class="chat">
-  <div class="top">
-    <span class="dot" id="dot" role="img" aria-label="status"></span>
+<div class="term">
+  <div class="head">
+    <span><b>porch</b><span class="meta" id="meta"></span></span>
     <button class="icon" id="next" aria-label="someone else" disabled>↻</button>
   </div>
   <div class="log" id="log" aria-live="polite"></div>
   <form id="form">
+    <span class="prompt">&gt;</span>
     <input id="text" maxlength="400" autocomplete="off" aria-label="message" disabled>
-    <button aria-label="send" disabled>→</button>
+    <button class="icon" aria-label="send" disabled>→</button>
   </form>
 </div>
 
@@ -60,32 +60,45 @@ permalink: /porch/
   /* relay address comes from _config.yml, or ?relay=ws://localhost:7777 for testing */
   const RELAY = new URLSearchParams(location.search).get('relay') || '{{ site.chat_relay }}';
 
-  const dot = document.getElementById('dot');
+  const meta = document.getElementById('meta');
   const log = document.getElementById('log');
   const input = document.getElementById('text');
   const sendBtn = document.querySelector('form button');
   const nextBtn = document.getElementById('next');
 
-  let ws = null, matched = false, retry = 2000;
+  let ws = null, matched = false, retry = 2000, me = '', them = '';
 
-  function line(text, who) {
+  function stamp() {
+    const d = new Date();
+    return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+
+  /* one terminal-style line: time, then either "name: text" or a dim "· text" */
+  function line(name, cls, text) {
     const p = document.createElement('p');
-    p.className = who;
-    p.textContent = text;
+    const t = document.createElement('span');
+    t.className = 't';
+    t.textContent = stamp();
+    p.appendChild(t);
+    if (name) {
+      const n = document.createElement('span');
+      n.className = cls;
+      n.textContent = name + ': ';
+      p.appendChild(n);
+      p.appendChild(document.createTextNode(text));
+    } else {
+      const s = document.createElement('span');
+      s.className = 'sys';
+      s.textContent = '· ' + text;
+      p.appendChild(s);
+    }
     log.appendChild(p);
     log.scrollTop = log.scrollHeight;
   }
 
-  function divider() {
-    if (log.lastElementChild && log.lastElementChild.tagName !== 'HR') {
-      log.appendChild(document.createElement('hr'));
-      log.scrollTop = log.scrollHeight;
-    }
-  }
-
   function setState(state) {
-    matched = state === 'on';
-    dot.className = 'dot ' + state;
+    matched = state === 'open';
+    meta.textContent = '  ' + (me ? me + ' · ' : '') + state;
     input.disabled = sendBtn.disabled = nextBtn.disabled = !matched;
     if (matched) input.focus();
   }
@@ -97,12 +110,11 @@ permalink: /porch/
   }
 
   function connect() {
-    if (!RELAY || RELAY.charAt(0) === '{') return setState('off');
-    setState('connecting');
+    if (!RELAY || RELAY.charAt(0) === '{') return setState('offline');
     try {
       ws = new WebSocket(RELAY.replace(/\/$/, '') + '/visitor');
     } catch (e) {
-      return setState('off');
+      return setState('offline');
     }
     ws.onmessage = (ev) => {
       let m;
@@ -110,21 +122,23 @@ permalink: /porch/
       switch (m.type) {
         case 'matched':
           retry = 2000;
-          setState('on');
+          me = m.to || me;
+          them = m.keeper || them;
+          setState('open');
           break;
         case 'empty':
-          setState('off');
+          setState('offline');
           break;
         case 'msg':
-          line(m.text, 'them');
+          line(m.from || them, 'keeper', m.text);
           break;
         case 'gone':
-          divider();
-          setState('connecting');
+          line('', '', them + ' left');
+          setState('offline');
           break;
         case 'banned':
           retry = Infinity;
-          setState('off');
+          setState('offline');
           break;
         case 'error':
           shake();
@@ -132,8 +146,8 @@ permalink: /porch/
       }
     };
     ws.onclose = () => {
-      if (matched) divider();
-      setState('off');
+      if (matched) line('', '', them + ' left');
+      setState('offline');
       if (retry !== Infinity) {
         setTimeout(connect, retry);
         retry = Math.min(retry * 2, 60000);
@@ -150,15 +164,16 @@ permalink: /porch/
     const text = input.value.trim();
     if (!text || !matched) return;
     send({ type: 'msg', text });
-    line(text, 'me');
+    line(me || 'you', 'anon', text);
     input.value = '';
   });
   nextBtn.onclick = () => {
     if (!matched) return;
-    divider();
+    line('', '', them + ' left');
     send({ type: 'reroll' });
   };
 
+  setState('offline');
   connect();
 </script>
 </body>
